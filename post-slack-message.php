@@ -1,7 +1,11 @@
 <?php
 // Post slack message by GET request.
+$messenger = new PostSlackMessenger();
+
 ?><html><head>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<link rel="apple-touch-icon" href="img/slack_komeda_57x57.jpg" />
+    <?php $messenger->the_touch_icon(); ?>
 	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
@@ -12,7 +16,7 @@
 	</style>
 </head><body>
 <table class="table table-condensed"><?php
-PostSlackMessage::post();
+$messenger->post();
 ?>
 </table></body></html>
 <?php
@@ -22,10 +26,12 @@ PostSlackMessage::post();
  *
  * Class PostSlackMessage
  */
-class PostSlackMessage {
+class PostSlackMessenger {
 
 	// url with token
 	private static $webhook_url = '';
+
+	private $touch_icon = '';
 
 	private static $secret = 'some-password-here';
 
@@ -39,13 +45,41 @@ class PostSlackMessage {
 		'icon_emoji' => ':ghost:',
 	);
 
-	private static function receive_query() {
-		foreach ( self::$payload as $key => $value ) {
+	public function __construct() {
+        $this->receive_query();
+    }
+
+	/**
+	 *
+	 */
+	public function the_touch_icon() {
+	    if ( isset($this->touch_icon) && !empty($this->touch_icon)) {
+            ?>
+            <link rel="apple-touch-icon" href="<?php echo $this->touch_icon; ?>" />
+		    <?php
+        }
+    }
+
+	/**
+	 * Sets GET values into payloads
+	 */
+	private function receive_query() {
+		foreach ( $_GET as $key => $value ) {
 			// Allows empty string to set empty
-			if ( isset($_GET[$key]) ) {
-				self::$payload[$key] = $_GET[$key];
+            switch ( $key ) {
+                case 'webhook_url':
+	                self::$webhook_url = $_GET[$key];
+	                break;
+                case 'touch-icon':
+                    $this->touch_icon = $_GET[$key];
+                    break;
+                default:
+                    if ( isset(self::$payload[$key])) {
+                        self::$payload[$key] = $_GET[$key];
+                    }
+                    break;
 			}
-			if ( !self::$silent ) {
+			if ( !self::$silent ) { // output
 				?>
 				<tr>
 					<td><?php echo $key; ?></td>
@@ -56,35 +90,7 @@ class PostSlackMessage {
 		}
 	}
 
-	/**
-	 * Checks 'secret' is correct
-	 *
-	 * @return bool
-	 */
-	private static function is_valid_secret() {
-		if ( isset(self::$secret) && !empty(self::$secret) &&
-		     $_GET['secret'] === self::$secret ) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	public static function post() {
-		if ( !self::is_valid_secret() ) {
-			?>
-			<tr>
-				<td>Error</td>
-				<td style="font-weight: bold; color: red;">
-					Invalid Secret
-				</td>
-			</tr>
-			<?php
-			return;
-		}
-
-		self::receive_query();
-
 		// sent message formatted as plain text.
 		// e.g.) payload={"channel":"#random",...}
 		$request_body = 'payload=' . json_encode( self::$payload );
