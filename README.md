@@ -1,1 +1,1 @@
-![screenshot-1](https://raw.githubusercontent.com/yousan/post-slack-message/master/img/screenshot-1.png){:width="160":height=24}
+![screenshot-1](https://raw.githubusercontent.com/yousan/post-slack-message/master/img/screenshot-1.png =100x20)
