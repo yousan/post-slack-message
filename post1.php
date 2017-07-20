@@ -50,6 +50,13 @@ $messenger->post();
 </body>
 <footer>
     <script src="js/scripts.js"></script>
+    <script>
+        $(function() {
+            $('img.preset').on('click', function() {
+                $('#touch_icon').val($(this).attr('src'));
+            });
+        });
+    </script>
 </footer>
 </html>
 <?php
