@@ -89,6 +89,18 @@ class PostSlackMessenger {
 	}
 
 	/**
+	 * Show HTML title.
+     * Displays the text message for homescreen title.
+     */
+	public function the_html_title() {
+        if ( !empty($_GET['text']) ) {
+            echo $_GET['text'];
+        } else {
+            echo 'Slack Post Message';
+        }
+    }
+
+	/**
 	 * Show icon-url link tag.
 	 */
 	public function the_touch_icon() {
