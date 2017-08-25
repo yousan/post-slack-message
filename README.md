@@ -1,6 +1,7 @@
 # What's this?
 Post a Slack message by "GET" URL.
 You can post 1-tap with Homescreen icon.
+[one-tap.l2tp.org](Online version here)
 
 # Homescreen
 You can add the URL into your iPhone as "Homescreen" shortcut.
